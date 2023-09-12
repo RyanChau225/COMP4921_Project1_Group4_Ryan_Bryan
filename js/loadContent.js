@@ -1,9 +1,47 @@
 const links = [
-  "https://example1.com",
-  "https://example2.com",
-  "https://example3.com",
-  // ... more links
+  {
+      id: 1,
+      url: "https://example1.com",
+      shortUrl: "https://exmpl1.com",
+      hits: 10,
+      active: true,
+      created: "01/01/2023",
+      lastHit: "05/01/2023"
+  },
+  {
+      id: 2,
+      url: "https://example2.com",
+      shortUrl: "https://exmpl2.com",
+      hits: 5,
+      active: false,
+      created: "02/01/2023",
+      lastHit: "03/01/2023"
+  },
+  {
+      id: 3,
+      url: "https://example3.com",
+      shortUrl: "https://exmpl3.com",
+      hits: 20,
+      active: true,
+      created: "03/01/2023",
+      lastHit: "04/01/2023"
+  },
+  // ... your existing links
 ];
+
+// Generating 12 additional dummy data
+for (let i = 4; i <= 15; i++) {
+  links.push({
+      id: i,
+      url: `https://example${i}.com`,
+      shortUrl: `https://exmpl${i}.com`,
+      hits: Math.floor(Math.random() * 50),  // random number of hits between 0 and 50
+      active: Math.random() < 0.5,  // random boolean for active status
+      created: `0${i % 5 + 1}/01/2023`,
+      lastHit: `0${(i + 2) % 5 + 1}/01/2023`
+  });
+}
+
 
 document.addEventListener("DOMContentLoaded", function() {
   // Load header
@@ -70,13 +108,36 @@ function populateTable() {
 
   links.forEach(link => {
       const row = tableBody.insertRow();
-      const cell = row.insertCell(0);
+      
+      let cell = row.insertCell(0);
+      cell.textContent = link.id;
+
+      cell = row.insertCell(1);
       const anchor = document.createElement("a");
-      anchor.href = link;
-      anchor.textContent = link;
+      anchor.href = link.url;
+      anchor.textContent = link.url;
       cell.appendChild(anchor);
+
+      cell = row.insertCell(2);
+      const shortAnchor = document.createElement("a");
+      shortAnchor.href = link.shortUrl;
+      shortAnchor.textContent = link.shortUrl;
+      cell.appendChild(shortAnchor);
+
+      cell = row.insertCell(3);
+      cell.textContent = link.hits;
+
+      cell = row.insertCell(4);
+      cell.textContent = link.active ? "Yes" : "No";
+
+      cell = row.insertCell(5);
+      cell.textContent = link.created;
+
+      cell = row.insertCell(6);
+      cell.textContent = link.lastHit;
   });
 }
+
 
 function searchFunction() {
   const query = this.value.toLowerCase();
