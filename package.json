@@ -1,0 +1,22 @@
+{
+  "name": "comp4921_project1_group4_ryan_bryan",
+  "version": "1.0.0",
+  "description": "COMP 3921",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spicious225/COMP4921_Project1_Group4_Ryan_Bryan.git"
+  },
+  "author": "Bryan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/spicious225/COMP4921_Project1_Group4_Ryan_Bryan/issues"
+  },
+  "homepage": "https://github.com/spicious225/COMP4921_Project1_Group4_Ryan_Bryan#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
