@@ -1,5 +1,6 @@
 body {
   display: flex;
+  padding-top: 6rem;
   flex-direction: column;
   min-height: 100vh;
   background-image: url('codioful-formerly-gradienta-LeG68PrXA6Y-unsplash.jpg');
@@ -11,12 +12,18 @@ body {
   /* This will center the image in the viewport */
   background-attachment: fixed;
   /* This ensures the image remains fixed while scrolling */
+
+  
 }
 
 .is-opaque {
-  background-color: rgba(200, 200, 200, 0.4); /* White with 70% opacity */
+  background-color: rgba(200, 200, 200, 0.2); /* White with 70% opacity */
 }
 
+
+.navbar {
+  transition: opacity 0.3s ease; /* Smooth transition for showing/hiding the header */
+}
 
 
 .main-content {
