@@ -22,7 +22,7 @@ body {
 
 
 .navbar {
-  transition: opacity 0.3s ease; /* Smooth transition for showing/hiding the header */
+  transition: opacity 0.5s ease; /* Smooth transition for showing/hiding the header */
 }
 
 
@@ -33,4 +33,34 @@ body {
 
 .reduced-padding {
   padding: 1rem;
+}
+
+#searchBox {
+  border: none;           /* Remove default borders */
+  outline: none;          /* Remove focus outline */
+  padding: 10px 5px;      /* Add some padding */
+  width: 95%;          
+  /* width: 735px; */
+  transition: border-bottom-color 0.3s; /* Add transition */
+  background-color: rgba(255, 255, 255, 0.5);  /* white with 50% opacity */
+    transition: background-color 0.4s ease;  /* Smooth transition for the background color */
+    border: none;
+    outline: none;
+}
+
+/* Change the color of the bottom border on focus */
+#searchBox:focus {
+  background-color: rgba(255, 255, 255);
+}
+
+#btnAddLink, #btnAddImage, #btnAddText {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;        /* White border */
+  color: rgb(0, 0, 0);                   /* White text color */
+  transition: background-color 0.4s ease;  /* Smooth transition for the background color */
+}
+
+#btnAddLink:hover, #btnAddImage:hover, #btnAddText:hover {
+  background-color: rgba(255, 255, 255, 0.9);       /* White background on hover */
+  color: black;                  /* Black text color on hover */
 }

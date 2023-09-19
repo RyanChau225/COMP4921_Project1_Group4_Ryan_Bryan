@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hello Bulma!</title>
+    <title>Ryan and Bryan's Media!</title>
 
     <!-- Links -->
     <div id="links"></div>
@@ -19,11 +19,11 @@
   <div class="main-content">
     <section class="section">
       <div class="container has-text-centered">
-        <h1 class="title">
-          Hello World
+        <h1 class="title is-1">
+          Welcome to!
         </h1>
-        <p class="subtitle">
-          My first website with <strong>Bulma</strong>!
+        <p class="subtitle is-3">
+          Ryan and Bryan's <strong>Media</strong>!
         </p>
       </div>
     </section>
@@ -41,30 +41,36 @@
     </section>
     <section class="section">
       <div class="container">
-        <div class="columns is-centered">
-          <div class="column is-6">
-            <input type="text" id="searchBox" class="box is-fullwidth" placeholder="Search links...">
-            <table id="linksTable" class="table">
-              <thead>
-                  <tr>
-                      <th>ID</th>
-                      <th>URL</th>
-                      <th>Short URL</th>
-                      <th>Hits</th>
-                      <th>Active</th>
-                      <th>Created</th>
-                      <th>Last Hit</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <!-- Rows will be populated here -->
-              </tbody>
-          </table>
-          
+          <div class="columns is-centered">
+              <div class="column is-10-mobile is-8-tablet is-7-desktop">
+                  <input type="text" id="searchBox" class="box is-fullwidth" placeholder="Search links...">
+                  
+                  <!-- Wrap the table in the table-container div -->
+                  <div class="table-container">
+                      <table id="linksTable" class="table">
+                          <thead>
+                              <tr>
+                                  <th>ID</th>
+                                  <th>URL</th>
+                                  <th>Short URL</th>
+                                  <th>Hits</th>
+                                  <th>Active</th>
+                                  <th>Created</th>
+                                  <th>Last Hit</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <!-- Rows will be populated here -->
+                          </tbody>
+                      </table>
+                  </div>
+                  
+              </div>
           </div>
-        </div>
       </div>
-    </section>
+  </section>
+  
+    
   </div>
 
 
