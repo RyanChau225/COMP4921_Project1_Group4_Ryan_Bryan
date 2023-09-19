@@ -55,7 +55,7 @@ app.use(express.static('public'));
 
 // Route to render login.ejs when website is initially visited.
 app.get('/', (req, res) => {
-    res.render('login.ejs');
+    res.render("index.ejs");
 })
 
 
