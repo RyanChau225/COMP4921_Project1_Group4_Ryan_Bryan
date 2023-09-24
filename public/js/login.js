@@ -1,7 +1,7 @@
 function processLogin(data) {
     if (data) {
         window.alert('You have successfully logged in!');
-        window.location.href = "http://localhost:3000/";
+        window.location.href = "http://localhost:3000/home";
     } else {
         window.alert('No User or Pass exists, please dbl check');
     }

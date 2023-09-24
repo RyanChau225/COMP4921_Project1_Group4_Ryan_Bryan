@@ -1,5 +1,5 @@
 require('dotenv').config();
-// const PORT = 3000;
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -68,6 +68,11 @@ app.get('/login', (req, res) => {
 // Render signup.ejs
 app.get('/signup', (req, res) => {
     res.render("signup.ejs");
+})
+
+// Render signup.ejs
+app.get('/home', (req, res) => {
+    res.render("home.ejs");
 })
 
 // Route that sends all user data to client
