@@ -1,16 +1,25 @@
-require('dotenv').config();
+require('dotenv').config(); // FOR ENV ENVIORMENT 
 
 const express = require('express');
-const app = express();
+const app = express(); 
+
 const mongoose = require('mongoose');
+
 const bodyparser = require('body-parser');
+
 const bcrypt = require('bcrypt');
 const {
     render
 } = require('express/lib/response');
+
+const router = include('routes/router');
+
 var session = require('express-session');
 const req = require('express/lib/request');
 app.set('view engine', 'ejs');
+
+
+const port = process.env.PORT || 3000; // place port in variable 
 
 
 const mongodb_host = process.env.REMOTE_MONGODB_HOST;
@@ -283,7 +292,8 @@ app.get("*", (req,res) => {
 	res.render("404");
 })
 
-app.listen(process.env.PORT || 3000, function (err) {
+app.listen(port, function (err) {
+    console.log("Node application listening on port "+port);
     if (err)
         console.log(err);
 })
