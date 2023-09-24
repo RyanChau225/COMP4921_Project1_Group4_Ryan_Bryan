@@ -273,6 +273,11 @@ app.get('/logout', (req, res) => {
 })
 
 
+app.get("*", (req,res) => {
+	res.status(404);
+	res.render("404");
+})
+
 app.listen(process.env.PORT || 3000, function (err) {
     if (err)
         console.log(err);
