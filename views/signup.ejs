@@ -22,17 +22,42 @@
 
     <!-- Main Content -->
     <main>
-        <form id="signup-form">
-            <div id="username-field">
-                <input type="text" placeholder="Username" id="username-text-field">
+        <form action="addUser" method="post">
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Add New User</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input name="first_name" class="input" type="text" placeholder="First Name">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input name="last_name" class="input" type="text" placeholder="Last Name">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input name="email" class="input" type="email" placeholder="Email">
+                  </p>
+                </div>
+                <div class="field">
+                  <p class="control is-expanded">
+                    <input name="password" class="input" type="password" placeholder="Password">
+                  </p>
+                </div>
+                <div class="field">
+                    <button class="button is-link">
+                        <span>Add</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-user-plus"></i>
+                        </span>
+                    </button>
+                </div>
+              </div>
             </div>
-            <div id="password-field">
-                <input type="password" placeholder="Password" id="password-text-field">
-            </div>
-            <div id="name-field">
-                <input type="text" placeholder="Name" id="name-text-field">
-            </div>
-            <input type="button" id="signup-button" value="Sign Up">
         </form>
     </main>
 
