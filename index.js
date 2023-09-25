@@ -9,7 +9,7 @@ global.include = function(file) {
 
 require('dotenv').config(); // FOR ENV ENVIORMENT 
 
-// const database = include('databaseConnectionMongoDB');
+const database = include('databaseConnectionMongoDB');
 
 const express = require('express');
 const app = express(); 
@@ -32,9 +32,9 @@ app.set('view engine', 'ejs');
 const port = process.env.PORT || 3000; // place port in variable 
 
 
-// const mongodb_host = process.env.REMOTE_MONGODB_HOST;
-// const mongodb_user = process.env.REMOTE_MONGODB_USER;
-// const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
+const mongodb_host = process.env.REMOTE_MONGODB_HOST;
+const mongodb_user = process.env.REMOTE_MONGODB_USER;
+const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
 
 app.use(bodyparser.urlencoded({
     parameterLimit: 100000,
@@ -42,7 +42,14 @@ app.use(bodyparser.urlencoded({
     extended: true
 }));
 
+
 app.use('/',router);
+
+// // Route to render login.ejs when website is initially visited.
+// app.get('/', (req, res) => {
+//     res.render("index.ejs");
+// })
+
 
 // Use the session middleware
 app.use(session({
@@ -50,6 +57,9 @@ app.use(session({
     saveUninitialized: true,
     resave: true
 }));
+
+// instead of using app.get() for every file, use this middleware instead. It serves all the required files to the client for you.
+app.use(express.static('public'));
 
 // // Connect mongoose to server
 // mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}?retryWrites=true&w=majority`, {
@@ -67,15 +77,6 @@ const userSchema = new mongoose.Schema({
 
 const userModel = mongoose.model("users", userSchema);
 
-
-// instead of using app.get() for every file, use this middleware instead. It serves all the required files to the client for you.
-app.use(express.static('public'));
-
-
-// Route to render login.ejs when website is initially visited.
-app.get('/', (req, res) => {
-    res.render("index.ejs");
-})
 
 
 // Render login.ejs.
@@ -149,7 +150,7 @@ app.post('/userSignUp', (req, res) => {
                 res.send(data.name);
             })
         } else {
-            res.send(true);
+            res.render("index.ejs");
         }
     })
 })

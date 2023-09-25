@@ -34,30 +34,30 @@ router.use(mongoSanitize(
 
 router.get('/', async (req, res) => {
 	console.log("page hit");
+	res.render("index.ejs");
 
+	// try {
+	// 	const users = await userCollection.find().project({first_name: 1, last_name: 1, email: 1, _id: 1}).toArray();
 
-	try {
-		const users = await userCollection.find().project({first_name: 1, last_name: 1, email: 1, _id: 1}).toArray();
+	// 	if (users === null) {
+	// 		res.render('error', {message: 'Error connecting to MongoDB'});
+	// 		console.log("Error connecting to user collection");
+	// 	}
+	// 	else {
+	// 		users.map((item) => {
+	// 			item.user_id = item._id;
+	// 			return item;
+	// 		});
+	// 		console.log(users);
 
-		if (users === null) {
-			res.render('error', {message: 'Error connecting to MongoDB'});
-			console.log("Error connecting to user collection");
-		}
-		else {
-			users.map((item) => {
-				item.user_id = item._id;
-				return item;
-			});
-			console.log(users);
-
-			res.render('index', {allUsers: users});
-		}
-	}
-	catch(ex) {
-		res.render('error', {message: 'Error connecting to MySQL'});
-		console.log("Error connecting to MySQL");
-		console.log(ex);
-	}
+	// 		res.render('index', {allUsers: users});
+	// 	}
+	// }
+	// catch(ex) {
+	// 	res.render('error', {message: 'Error connecting to MySQL'});
+	// 	console.log("Error connecting to MySQL");
+	// 	console.log(ex);
+	// }
 });
 
 router.get('/pic', async (req, res) => {
@@ -176,40 +176,40 @@ router.get('/showPets', async (req, res) => {
 	}
 });
 
-router.get('/deleteUser', async (req, res) => {
-	try {
-		console.log("delete user");
+// router.get('/deleteUser', async (req, res) => {
+// 	try {
+// 		console.log("delete user");
 
-		let user_id = req.query.id;
+// 		let user_id = req.query.id;
 
-		const schema = Joi.object(
-			{
-				user_id: Joi.string().alphanum().min(24).max(24).required()
-			});
+// 		const schema = Joi.object(
+// 			{
+// 				user_id: Joi.string().alphanum().min(24).max(24).required()
+// 			});
 		
-		const validationResult = schema.validate({user_id});
-		if (validationResult.error != null) {
-			console.log(validationResult.error);
+// 		const validationResult = schema.validate({user_id});
+// 		if (validationResult.error != null) {
+// 			console.log(validationResult.error);
 
-			res.render('error', {message: 'Invalid user_id'});
-			return;
-		}				
+// 			res.render('error', {message: 'Invalid user_id'});
+// 			return;
+// 		}				
 
-		if (user_id) {
-			console.log("userId: "+user_id);
-			const result1 = await petCollection.deleteMany({"user_id": new ObjectId(user_id)});
-			const result2 = await userCollection.deleteOne({"_id": new ObjectId(user_id)});
+// 		if (user_id) {
+// 			console.log("userId: "+user_id);
+// 			const result1 = await petCollection.deleteMany({"user_id": new ObjectId(user_id)});
+// 			const result2 = await userCollection.deleteOne({"_id": new ObjectId(user_id)});
 
-			console.log("deleteUser: ");
-		}
-		res.redirect("/");
-	}
-	catch(ex) {
-		res.render('error', {message: 'Error connecting to MongoDB'});
-		console.log("Error connecting to MongoDB");
-		console.log(ex);	
-	}
-});
+// 			console.log("deleteUser: ");
+// 		}
+// 		res.redirect("/");
+// 	}
+// 	catch(ex) {
+// 		res.render('error', {message: 'Error connecting to MongoDB'});
+// 		console.log("Error connecting to MongoDB");
+// 		console.log(ex);	
+// 	}
+// });
 
 router.get('/deletePetImage', async (req, res) => {
 	try {
@@ -256,52 +256,52 @@ router.get('/deletePetImage', async (req, res) => {
 	}
 });
 
-router.post('/addUser', async (req, res) => {
-	try {
-		console.log("form submit");
+// router.post('/addUser', async (req, res) => {
+// 	try {
+// 		console.log("form submit");
 
-		const password_salt = crypto.createHash('sha512');
+// 		const password_salt = crypto.createHash('sha512');
 
-		password_salt.update(uuid());
+// 		password_salt.update(uuid());
 		
-		const password_hash = crypto.createHash('sha512');
+// 		const password_hash = crypto.createHash('sha512');
 
-		password_hash.update(req.body.password+passwordPepper+password_salt);
+// 		password_hash.update(req.body.password+passwordPepper+password_salt);
 
-		const schema = Joi.object(
-			{
-				first_name: Joi.string().alphanum().min(2).max(50).required(),
-				last_name: Joi.string().alphanum().min(2).max(50).required(),
-				email: Joi.string().email().min(2).max(150).required()
-			});
+// 		const schema = Joi.object(
+// 			{
+// 				first_name: Joi.string().alphanum().min(2).max(50).required(),
+// 				last_name: Joi.string().alphanum().min(2).max(50).required(),
+// 				email: Joi.string().email().min(2).max(150).required()
+// 			});
 		
-		const validationResult = schema.validate({first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email});
+// 		const validationResult = schema.validate({first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email});
 		
-		if (validationResult.error != null) {
-			console.log(validationResult.error);
+// 		if (validationResult.error != null) {
+// 			console.log(validationResult.error);
 
-			res.render('error', {message: 'Invalid first_name, last_name, email'});
-			return;
-		}				
+// 			res.render('error', {message: 'Invalid first_name, last_name, email'});
+// 			return;
+// 		}				
 
-		await userCollection.insertOne(
-			{	
-				first_name: req.body.first_name,
-				last_name: req.body.last_name,
-				email: req.body.email,
-				password_salt: password_salt.digest('hex'),
-				password_hash: password_hash.digest('hex')
-			}
-		);
+// 		await userCollection.insertOne(
+// 			{	
+// 				first_name: req.body.first_name,
+// 				last_name: req.body.last_name,
+// 				email: req.body.email,
+// 				password_salt: password_salt.digest('hex'),
+// 				password_hash: password_hash.digest('hex')
+// 			}
+// 		);
 
-		res.redirect("/");
-	}
-	catch(ex) {
-		res.render('error', {message: 'Error connecting to MySQL'});
-		console.log("Error connecting to MySQL");
-		console.log(ex);	
-	}
-});
+// 		res.redirect("/");
+// 	}
+// 	catch(ex) {
+// 		res.render('error', {message: 'Error connecting to MySQL'});
+// 		console.log("Error connecting to MySQL");
+// 		console.log(ex);	
+// 	}
+// });
 
 
 router.post('/addPet', async (req, res) => {
