@@ -32,9 +32,11 @@ app.set('view engine', 'ejs');
 const port = process.env.PORT || 3000; // place port in variable 
 
 
-const mongodb_host = process.env.REMOTE_MONGODB_HOST;
-const mongodb_user = process.env.REMOTE_MONGODB_USER;
-const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
+// const mongodb_host = process.env.REMOTE_MONGODB_HOST;
+// const mongodb_user = process.env.REMOTE_MONGODB_USER;
+// const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
+
+const secret_token = process.env.SECRET_TOKEN
 
 app.use(bodyparser.urlencoded({
     parameterLimit: 100000,
@@ -53,7 +55,7 @@ app.use('/',router);
 
 // Use the session middleware
 app.use(session({
-    secret: "hello, world",
+    secret: `${secret_token}`,
     saveUninitialized: true,
     resave: true
 }));
