@@ -23,7 +23,7 @@ const upload = multer({ storage: storage })
 
 const mongodb_database = process.env.REMOTE_MONGODB_DATABASE;
 const userCollection = database.db(mongodb_database).collection('users');
-const petCollection = database.db(mongodb_database).collection('pets');
+const mediaCollection = database.db(mongodb_database).collection('Media');
 
 const Joi = require("joi");
 const mongoSanitize = require('express-mongo-sanitize');
@@ -84,9 +84,9 @@ function sleep(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-router.post('/setPetPic', upload.single('image'), function(req, res, next) {
+router.post('/setmediaPic', upload.single('image'), function(req, res, next) {
 	let image_uuid = uuid();
-	let pet_id = req.body.pet_id;
+	let media_id = req.body.media_id;
 	let user_id = req.body.user_id;
 	let buf64 = req.file.buffer.toString('base64');
 	stream = cloudinary.uploader.upload("data:image/octet-stream;base64," + buf64, async function(result) { 
@@ -99,28 +99,28 @@ router.post('/setPetPic', upload.single('image'), function(req, res, next) {
 				// Joi validate
 				const schema = Joi.object(
 				{
-					pet_id: Joi.string().alphanum().min(24).max(24).required(),
+					media_id: Joi.string().alphanum().min(24).max(24).required(),
 					user_id: Joi.string().alphanum().min(24).max(24).required()
 				});
 			
-				const validationResult = schema.validate({pet_id, user_id});
+				const validationResult = schema.validate({media_id, user_id});
 				if (validationResult.error != null) {
 					console.log(validationResult.error);
 
-					res.render('error', {message: 'Invalid pet_id or user_id'});
+					res.render('error', {message: 'Invalid media_id or user_id'});
 					return;
 				}				
-				const success = await petCollection.updateOne({"_id": new ObjectId(pet_id)},
+				const success = await mediaCollection.updateOne({"_id": new ObjectId(media_id)},
 					{$set: {image_id: image_uuid}},
 					{}
 				);
 
 				if (!success) {
-					res.render('error', {message: 'Error uploading pet image to MongoDB'});
-					console.log("Error uploading pet image");
+					res.render('error', {message: 'Error uploading media image to MongoDB'});
+					console.log("Error uploading media image");
 				}
 				else {
-					res.redirect(`/showPets?id=${user_id}`);
+					res.redirect(`/showMedia?id=${user_id}`);
 				}
 			}
 			catch(ex) {
@@ -135,7 +135,7 @@ router.post('/setPetPic', upload.single('image'), function(req, res, next) {
 	console.log(req.file);
 });
 
-router.get('/showPets', async (req, res) => {
+router.get('/showMedia', async (req, res) => {
 	console.log("page hit");
 	try {
 		let user_id = req.query.id;
@@ -154,19 +154,19 @@ router.get('/showPets', async (req, res) => {
 			res.render('error', {message: 'Invalid user_id'});
 			return;
 		}				
-		const pets = await petCollection.find({"user_id": new ObjectId(user_id)}).toArray();
+		const Media = await mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
 
-		if (pets === null) {
+		if (Media === null) {
 			res.render('error', {message: 'Error connecting to MongoDB'});
 			console.log("Error connecting to userModel");
 		}
 		else {
-			pets.map((item) => {
-				item.pet_id = item._id;
+			Media.map((item) => {
+				item.media_id = item._id;
 				return item;
 			});			
-			console.log(pets);
-			res.render('pets', {allPets: pets, user_id: user_id});
+			console.log(Media);
+			res.render('Media', {allMedia: Media, user_id: user_id});
 		}
 	}
 	catch(ex) {
@@ -197,7 +197,7 @@ router.get('/showPets', async (req, res) => {
 
 // 		if (user_id) {
 // 			console.log("userId: "+user_id);
-// 			const result1 = await petCollection.deleteMany({"user_id": new ObjectId(user_id)});
+// 			const result1 = await mediaCollection.deleteMany({"user_id": new ObjectId(user_id)});
 // 			const result2 = await userCollection.deleteOne({"_id": new ObjectId(user_id)});
 
 // 			console.log("deleteUser: ");
@@ -211,43 +211,43 @@ router.get('/showPets', async (req, res) => {
 // 	}
 // });
 
-router.get('/deletePetImage', async (req, res) => {
+router.get('/deletemediaImage', async (req, res) => {
 	try {
-		console.log("delete pet image");
+		console.log("delete media image");
 
-		let pet_id = req.query.id;
+		let media_id = req.query.id;
 		let user_id = req.query.user;
 
 		const schema = Joi.object(
 			{
 				user_id: Joi.string().alphanum().min(24).max(24).required(),
-				pet_id: Joi.string().alphanum().min(24).max(24).required(),
+				media_id: Joi.string().alphanum().min(24).max(24).required(),
 			});
 		
-		const validationResult = schema.validate({user_id, pet_id});
+		const validationResult = schema.validate({user_id, media_id});
 		
 		if (validationResult.error != null) {
 			console.log(validationResult.error);
 
-			res.render('error', {message: 'Invalid user_id or pet_id'});
+			res.render('error', {message: 'Invalid user_id or media_id'});
 			return;
 		}				
 
-		if (pet_id) {
-			console.log("petId: "+pet_id);
-			const success = await petCollection.updateOne({"_id": new ObjectId(pet_id)},
+		if (media_id) {
+			console.log("mediaId: "+media_id);
+			const success = await mediaCollection.updateOne({"_id": new ObjectId(media_id)},
 				{$set: {image_id: undefined}},
 				{}
 			);
 
-			console.log("delete Pet Image: ");
+			console.log("delete media Image: ");
 			console.log(success);
 			if (!success) {
 				res.render('error', {message: 'Error connecting to MongoDB'});
 				return;
 			}
 		}
-		res.redirect(`/showPets?id=${user_id}`);
+		res.redirect(`/showMedia?id=${user_id}`);
 	}
 	catch(ex) {
 		res.render('error', {message: 'Error connecting to MongoDB'});
@@ -257,7 +257,7 @@ router.get('/deletePetImage', async (req, res) => {
 });
 
 
-router.post('/addPet', async (req, res) => {
+router.post('/addmedia', async (req, res) => {
 	try {
 		console.log("form submit");
 
@@ -267,10 +267,10 @@ router.post('/addPet', async (req, res) => {
 			{
 				user_id: Joi.string().alphanum().min(24).max(24).required(),
 				name: Joi.string().alphanum().min(2).max(50).required(),
-				pet_type: Joi.string().alphanum().min(2).max(150).required()
+				media_type: Joi.string().alphanum().min(2).max(150).required()
 			});
 		
-		const validationResult = schema.validate({user_id, name: req.body.pet_name, pet_type: req.body.pet_type});
+		const validationResult = schema.validate({user_id, name: req.body.media_name, media_type: req.body.media_type});
 		
 		if (validationResult.error != null) {
 			console.log(validationResult.error);
@@ -280,15 +280,15 @@ router.post('/addPet', async (req, res) => {
 		}				
 
 
-		await petCollection.insertOne(
+		await mediaCollection.insertOne(
 			{	
-				name: req.body.pet_name,
+				name: req.body.media_name,
 				user_id: new ObjectId(user_id),
-				pet_type: req.body.pet_type,
+				media_type: req.body.media_type,
 			}
 		);
 
-		res.redirect(`/showPets?id=${user_id}`);
+		res.redirect(`/showMedia?id=${user_id}`);
 	}
 	catch(ex) {
 		res.render('error', {message: 'Error connecting to MongoDB'});
