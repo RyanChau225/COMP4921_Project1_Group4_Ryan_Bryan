@@ -8,7 +8,7 @@ const {v4: uuid} = require('uuid');
 
 const passwordPepper = "SeCretPeppa4MySal+";
 
-const cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
+// const cloud_name = process.env.CLOUDINARY_CLOUD_NAME; Never Read
 
 const cloudinary = require('cloudinary');
 cloudinary.config({ 

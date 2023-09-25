@@ -1,4 +1,15 @@
+//Define the include function for absolute file name
+global.base_dir = __dirname;
+global.abs_path = function(path) {
+	return base_dir + path;
+}
+global.include = function(file) {
+	return require(abs_path('/' + file));
+}
+
 require('dotenv').config(); // FOR ENV ENVIORMENT 
+
+// const database = include('databaseConnectionMongoDB');
 
 const express = require('express');
 const app = express(); 
@@ -18,19 +29,20 @@ var session = require('express-session');
 const req = require('express/lib/request');
 app.set('view engine', 'ejs');
 
-
 const port = process.env.PORT || 3000; // place port in variable 
 
 
-const mongodb_host = process.env.REMOTE_MONGODB_HOST;
-const mongodb_user = process.env.REMOTE_MONGODB_USER;
-const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
+// const mongodb_host = process.env.REMOTE_MONGODB_HOST;
+// const mongodb_user = process.env.REMOTE_MONGODB_USER;
+// const mongodb_password = process.env.REMOTE_MONGODB_PASSWORD;
 
 app.use(bodyparser.urlencoded({
     parameterLimit: 100000,
     limit: '50mb',
     extended: true
 }));
+
+app.use('/',router);
 
 // Use the session middleware
 app.use(session({
@@ -39,11 +51,11 @@ app.use(session({
     resave: true
 }));
 
-// Connect mongoose to server
-mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}?retryWrites=true&w=majority`, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+// // Connect mongoose to server
+// mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}?retryWrites=true&w=majority`, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// });
 
 
 const userSchema = new mongoose.Schema({
@@ -56,8 +68,6 @@ const userSchema = new mongoose.Schema({
 const userModel = mongoose.model("users", userSchema);
 
 
-
-
 // instead of using app.get() for every file, use this middleware instead. It serves all the required files to the client for you.
 app.use(express.static('public'));
 
@@ -66,7 +76,6 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.render("index.ejs");
 })
-
 
 
 // Render login.ejs.
