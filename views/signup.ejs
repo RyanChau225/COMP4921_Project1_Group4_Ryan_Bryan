@@ -102,7 +102,7 @@ main {
 
     <!-- Main Content -->
     <main>
-        <form action="addUser" method="post">
+        <form id="signup-form" action="addUser" method="post">
             <div class="field is-horizontal">
               <div class="field-label is-normal">
                 <label class="label">Add New User</label>
@@ -142,6 +142,18 @@ main {
 
         <a href="/login" class="button">Already have an account?</a>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Add an event listener for page load
+            window.addEventListener('pageshow', function (event) {
+                var form = document.getElementById('signup-form');
+                if (form) {
+                    // Reset the form fields
+                    form.reset();
+                }
+            });
+        });
+    </script>
 
     <div id="footer-placeholder"></div>
 

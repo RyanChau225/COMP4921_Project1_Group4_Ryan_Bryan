@@ -25,7 +25,18 @@ const {
 const session = require('express-session');
 const MongoStore = require('connect-mongodb-session')(session);
 const express = require('express');
+const passwordComplexity = require("joi-password-complexity");
 
+// Define password complexity rules
+const complexityOptions = {
+  min: 10,            // Minimum length
+  max: 50,            // Maximum length (adjust as needed)
+  lowerCase: 1,       // Require at least 1 lowercase letter
+  upperCase: 1,       // Require at least 1 uppercase letter
+  numeric: 1,         // Require at least 1 digit
+  symbol: 1,          // Require at least 1 special character
+  requirementCount: 4, // Total number of requirements to satisfy
+};
 
 const req = require('express/lib/request');
 const ejs = require('ejs');
@@ -315,55 +326,61 @@ function requireAuthentication(req, res, next) {
 // });
 
 router.post('/addUser', async (req, res) => {
-    try {
-        console.log("form submit");
-
-        const saltRounds = 10;
-        const schema = Joi.object(
-            {
-                first_name: Joi.string().alphanum().min(2).max(50).required(),
-                last_name: Joi.string().alphanum().min(2).max(50).required(),
-                email: Joi.string().email().min(2).max(150).required()
-            });
-
-        const validationResult = schema.validate({
-            first_name: req.body.first_name,
-            last_name: req.body.last_name,
-            email: req.body.email
-        });
-
-        if (validationResult.error != null) {
-            console.log(validationResult.error);
-
-            res.render('error', { message: 'Invalid first_name, last_name, email' });
-            return;
-        }
-
-            bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
-                if (err) {
-                    console.log(err);
-                    return res.render('error', { message: 'An error occurred' });
-                }
-
-                await userCollection.insertOne({
-                    first_name: req.body.first_name,
-                    last_name: req.body.last_name,
-                    email: req.body.email,
-                    password: hash
-                });
-
-                // Login user via express-session
-                // req.session.username = req.body.username;
-
-                res.redirect("/");
-            });
-    } catch (ex) {
-        res.render('error', { message: 'Error connecting to MongoDB' });
-        console.log("Error connecting to MongoDB");
-        console.log(ex);
-    }
-});
-
+	try {
+	  console.log("form submit");
+  
+	  const saltRounds = 10;
+	  const schema = Joi.object({
+		first_name: Joi.string().alphanum().min(2).max(50).required(),
+		last_name: Joi.string().alphanum().min(2).max(50).required(),
+		email: Joi.string().email().min(2).max(150).required(),
+		password: passwordComplexity(complexityOptions).required(),
+	  });
+	  const validationResult = schema.validate({
+		first_name: req.body.first_name,
+		last_name: req.body.last_name,
+		email: req.body.email,
+		password: req.body.password,
+	  });
+  
+	  if (validationResult.error != null) {
+		console.log(validationResult.error);
+  
+		res.render('error', { message: validationResult.error.details[0].message });
+		return;
+	  }
+  
+	  // Check if the user already exists in the database
+	  const existingUser = await userCollection.findOne({ email: req.body.email });
+	  if (existingUser) {
+		return res.render('error', { message: 'User with this email already exists' });
+	  }
+  
+	  bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
+		if (err) {
+		  console.log(err);
+		  return res.render('error', { message: 'An error occurred' });
+		}
+  
+		await userCollection.insertOne({
+		  first_name: req.body.first_name,
+		  last_name: req.body.last_name,
+		  email: req.body.email,
+		  password: hash
+		});
+  
+		// Login user via express-session
+		// req.session.username = req.body.username;
+  
+		res.redirect("/");
+	  });
+	} catch (ex) {
+	  res.render('error', { message: 'Error connecting to MongoDB' });
+	  console.log("Error connecting to MongoDB");
+	  console.log(ex);
+	}
+  });
+  
 // Function to check if the username exists in the database
 // async function isUsernameInDb(username) {
 //     const user = await userCollection.findOne({ username });
@@ -414,7 +431,22 @@ router.post('/addUser', async (req, res) => {
 // 	}
 // });
 
+// Render addText.ejs
+router.get('/addText', (req, res) => {
+    res.render("addText.ejs");
+})
 
+
+// Render addImage.ejs
+router.get('/addImage', (req, res) => {
+    res.render("addImage.ejs");
+})
+
+
+// Render customURL.ejs
+router.get('/addCustomURL', (req, res) => {
+    res.render("customURL.ejs");
+})
 
 
 // Render signup.ejs
