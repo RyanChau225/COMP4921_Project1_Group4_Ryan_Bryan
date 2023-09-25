@@ -14,38 +14,32 @@
 </head>
 
 <body>
-    <form action="addUser" method="post">
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Signup</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control is-expanded">
-                <input name="username" class="input" type="text" placeholder="Username">
-              </p>
+    <div id="navbar-placeholder"></div>
+
+    <div id="page-title-container">
+        <h1 id="page-title">Signup</h1>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <form id="signup-form">
+            <div id="username-field">
+                <input type="text" placeholder="Username" id="username-text-field">
             </div>
-            <div class="field">
-              <p class="control is-expanded">
-                <input name="email" class="input" type="email" placeholder="Email">
-              </p>
+            <div id="password-field">
+                <input type="password" placeholder="Password" id="password-text-field">
             </div>
-            <div class="field">
-              <p class="control is-expanded">
-                <input name="password" class="input" type="password" placeholder="Password">
-              </p>
+            <div id="name-field">
+                <input type="text" placeholder="Name" id="name-text-field">
             </div>
-            <div class="field">
-                <button class="button is-link">
-                    <span>Add</span>
-                    <span class="icon is-small">
-                        <i class="fas fa-user-plus"></i>
-                    </span>
-                </button>
-            </div>
-          </div>
-        </div>
-    </form>
+            <input type="button" id="signup-button" value="Sign Up">
+        </form>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/signup.js" async defer></script>
+    <script src="/js/skeleton.js"></script>
 </body>
 
 </html>

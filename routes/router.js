@@ -18,6 +18,8 @@ cloudinary.config({
 });
 
 
+
+
 const multer  = require('multer')
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
@@ -41,11 +43,13 @@ const bcrypt = require('bcrypt');
 const {
     render
 } = require('express/lib/response');
+const session = require('express-session');
+const MongoStore = require('connect-mongodb-session')(session);
+const express = require('express');
 
 
-var session = require('express-session');
 const req = require('express/lib/request');
-
+const ejs = require('ejs');
 
 const secret_token = process.env.SECRET_TOKEN
 
@@ -55,46 +59,110 @@ const secret_token = process.env.SECRET_TOKEN
 //     extended: true
 // }));
 
-// // Use the session middleware
-// router.use(session({
-//     secret: `${secret_token}`,
-//     saveUninitialized: true,
-//     resave: true
-// }));
+// Use the session middleware
+router.use(session({
+    secret: `${secret_token}`,
+    saveUninitialized: true,
+    resave: true
+}));
+const db = mongoose.connection;
+const userSchema = new mongoose.Schema({
+	username: String,
+	password: String,
+	name: String,
+	admin: Boolean
+})
 
-
+const userModel = mongoose.model("users", userSchema);
 
 router.get('/', async (req, res) => {
 	console.log("page hit");
 	res.render("index.ejs");
 
-	try {
-		const users = await userCollection.find().project({username: 1, email: 1, _id: 1}).toArray();
+	// try {
+	// 	const users = await userCollection.find().project({username: 1, email: 1, _id: 1}).toArray();
 
-		if (users === null) {
-			res.render('error', {message: 'Error connecting to MongoDB'});
-			console.log("Error connecting to user collection");
-		}
-		else {
-			users.map((item) => {
-				item.user_id = item._id;
-				return item;
-			});
-			console.log(users);
+	// 	if (users === null) {
+	// 		res.render('error', {message: 'Error connecting to MongoDB'});
+	// 		console.log("Error connecting to user collection");
+	// 	}
+	// 	else {
+	// 		users.map((item) => {
+	// 			item.user_id = item._id;
+	// 			return item;
+	// 		});
+	// 		console.log(users);
 
-			res.render('index', {allUsers: users});
-		}
-	}
-	catch(ex) {
-		res.render('error', {message: 'Error connecting to MongoDB'});
-		console.log("Error connecting to MongoDB");
-		console.log(ex);
-	}
+	// 		res.render('index', {allUsers: users});
+	// 	}
+	// }
+	// catch(ex) {
+	// 	res.render('error', {message: 'Error connecting to MongoDB'});
+	// 	console.log("Error connecting to MongoDB");
+	// 	console.log(ex);
+	// }
 });
 
+router.get('/login', (req, res) => {
+	res.render('login.ejs', { message: req.session.message });
+  });
+
+  router.post('/login', (req, res) => {
+	let usernameToCheck = req.body.email;
+	let passwordToCheck = req.body.password; // This password is in plaintext.
+	let expectedHashedPassword = "";
+
+	userModel.find({
+		username: usernameToCheck
+	}, (err, data) => {
+		if (err) {
+			console.log(err);
+		} else {
+			if (data.length > 0) {
+				expectedHashedPassword = data[0].password;
+			}
 
 
+			bcrypt.compare(passwordToCheck, expectedHashedPassword, (err, result) => {
+				if (err) {
+					console.log(err);
+				} else if (result) {
+					req.session.authenticated = true;
+					req.session.username = data[0].username;
+					req.session.uid = data[0]._id;
+	
+					res.send(true);
+				} else {
+					res.send(false);
+				}
+			})
+		}
+	})
+})
 
+  router.get('/home', (req, res) => {
+	if (!req.session.authenticated) {
+	  return res.redirect('/login');
+	}
+  
+	User.findById(req.session.userId, (err, user) => {
+	  if (err || !user) {
+		return res.render('error', { message: 'User not found' });
+	  }
+  
+	  res.render('home.ejs', { user });
+	});
+  });
+  
+  router.get('/logout', (req, res) => {
+	req.session.destroy((err) => {
+	  if (err) {
+		console.error(err);
+	  }
+	  res.redirect('/login');
+	});
+  });
+  
 
 router.get('/pic', async (req, res) => {
 	  res.send('<form action="picUpload" method="post" enctype="multipart/form-data">'
@@ -258,53 +326,55 @@ router.get('/deletemediaImage', async (req, res) => {
 	}
 });
 
-router.post('/addUser', async (req, res) => {
-	try {
-		console.log("form submit");
-
-		const password_salt = crypto.createHash('sha512');
-
-		password_salt.update(uuid());
-		
-		const password_hash = crypto.createHash('sha512');
-
-		password_hash.update(req.body.password+passwordPepper+password_salt);
-
-		const schema = Joi.object(
-			{
-				username: Joi.string().alphanum().min(2).max(50).required(),
-				email: Joi.string().email().min(2).max(150).required()
-			});
-		
-		const validationResult = schema.validate({username: req.body.username, email: req.body.email});
-		
-		if (validationResult.error != null) {
-			console.log(validationResult.error);
-
-			res.render('error', {message: 'Invalid username, email'});
-			return;
-		}				
-
-		await userCollection.insertOne(
-			{	
-				username: req.body.username,
-				email: req.body.email,
-				password_salt: password_salt.digest('hex'),
-				password_hash: password_hash.digest('hex')
-			}
-		);
-
-		res.redirect("/");
-	}
-	catch(ex) {
-		if(ex.code == 11000){
-			res.render('error', {message: `No duplicates`});
-		}
-		else{
-		res.render('Message', {message: `${ex}`});
-		console.log(ex);	
-	}}
-});
+    // Check if the username exists in the database.
+    // I need to do this callback fuction thing only in server.js for some reason. I googled it and I don't understand why.
+    function isUsernameInDb(user, callback) {
+        userModel.find({
+            username: user
+        }, (err, data) => {
+            if (err) {
+                console.log(err)
+            }
+    
+            return callback(data.length != 0);
+        })
+    }
+    
+    // Signs up the user. Stores their credentials into the database. Then adds the user into the session.
+    router.post('/addUser', (req, res) => {
+        let isUsernameInDbVariable;
+        // I need to do this callback fuction thing only in server.js for some reason. I googled it and I don't understand why.
+        isUsernameInDb(req.body.username, (response) => {
+            isUsernameInDbVariable = response;
+        })
+    
+        const plaintextPassword = req.body.password;
+        const saltRounds = 10;
+    
+        bcrypt.hash(plaintextPassword, saltRounds, (err, hash) => {
+            if (!isUsernameInDbVariable) {
+                userModel.create({
+                    username: req.body.username,
+                    password: hash,
+                    name: req.body.name,
+                    admin: false
+                }, (err, data) => {
+                    if (err) {
+                        console.log(err);
+                    }
+    
+                    // Login user via express-session
+                    req.session.authenticated = true;
+                    req.session.username = data.username;
+                    req.session.uid = data._id;
+    
+                    res.send(data.name);
+                })
+            } else {
+                res.send(true);
+            }
+        })
+    })
 
 
 router.post('/addmedia', async (req, res) => {
@@ -350,20 +420,11 @@ router.post('/addmedia', async (req, res) => {
 
 
 
-// Render login.ejs.
-router.get('/login', (req, res) => {
-    res.render("login.ejs");
-})
-
 // Render signup.ejs
 router.get('/signup', (req, res) => {
     res.render("signup.ejs");
 })
 
-// Render signup.ejs
-router.get('/home', (req, res) => {
-    res.render("home.ejs");
-})
 
 
 
