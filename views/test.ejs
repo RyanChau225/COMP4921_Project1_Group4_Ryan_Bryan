@@ -223,3 +223,91 @@
 		</section>
 	</body>
 </html> -->
+
+
+
+<!-- // // Adds a users into the databse. only for admin.
+// app.post('/addUser', (req, res) => {
+//     let isUsernameInDbVariable;
+//     // I need to do this callback fuction thing only in server.js for some reason. I googled it and I don't understand why.
+//     isUsernameInDb(req.body.username, (response) => {
+//         isUsernameInDbVariable = response;
+//     })
+
+//     const plaintextPassword = req.body.password;
+//     const saltRounds = 10;
+
+//     bcrypt.hash(plaintextPassword, saltRounds, (err, hash) => {
+//         if (!isUsernameInDbVariable) {
+//             userModel.create({
+//                 username: req.body.username,
+//                 password: hash,
+//                 name: req.body.name,
+//                 admin: req.body.admin
+//             }, (err, data) => {
+//                 if (err) {
+//                     console.log(err);
+//                 }
+
+//                 res.send(data.name);
+//             })
+//         } else {
+//             res.send(true);
+//         }
+//     })
+// })
+
+// router.post('/checkUserCredentials', (req, res) => {
+//     let usernameToCheck = req.body.username;
+//     let passwordToCheck = req.body.password; // This password is in plaintext.
+//     let expectedHashedPassword = "";
+
+//     userModel.find({
+//         username: usernameToCheck
+//     }, (err, data) => {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             if (data.length > 0) {
+//                 expectedHashedPassword = data[0].password;
+//             }
+
+
+//             bcrypt.compare(passwordToCheck, expectedHashedPassword, (err, result) => {
+//                 if (err) {
+//                     console.log(err);
+//                 } else if (result) {
+//                     req.session.authenticated = true;
+//                     req.session.username = data[0].username;
+//                     req.session.uid = data[0]._id;
+    
+//                     res.send(true);
+//                 } else {
+//                     res.send(false);
+//                 }
+//             })
+//         }
+//     })
+// })
+
+
+
+
+
+// // Check if user is logged in.
+// router.get('/isUserLoggedIn', (req, res) => {
+//     if (req.session.authenticated) {
+//         res.send(true);
+//     } else {
+//         res.send(false);
+//     }
+// })
+
+// // Ends the user session.
+// router.get('/logout', (req, res) => {
+//     req.session.authenticated = false;
+//     req.session.username = undefined;
+//     req.session.uid = undefined;
+
+//     res.render('login.ejs');
+// }) -->
