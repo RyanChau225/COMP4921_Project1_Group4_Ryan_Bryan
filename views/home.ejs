@@ -45,6 +45,21 @@
             bottom: 0;
             width: 100%;
         }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -53,7 +68,52 @@
     </header>
 
     <main>
-        <a href="/createMedia" class="button">Create Meida </a>
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>URL</th>
+					<th>Short URL</th>
+					<th>Hits</th>
+					<th>Active</th>
+					<th>Created</th>
+					<th>Last Hit</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td><a href="https://example.com/page1">https://example.com/page1</a></td>
+					<td><a href="http://shrt.ly/abc123">http://shrt.ly/abc123</a></td>
+					<td>42</td>
+					<td>Yes</td>
+					<td>2023-09-19</td>
+					<td>09:30 AM</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td><a href="https://example.com/page2">https://example.com/page2</a></td>
+					<td><a href="http://shrt.ly/def456">http://shrt.ly/def456</a></td>
+					<td>17</td>
+					<td>No</td>
+					<td>2023-09-18</td>
+					<td>04:45 PM</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td><a href="https://example.com/page3">https://example.com/page3</a></td>
+					<td><a href="http://shrt.ly/ghi789">http://shrt.ly/ghi789</a></td>
+					<td>98</td>
+					<td>Yes</td>
+					<td>2023-09-17</td>
+					<td>02:15 AM</td>
+				</tr>
+			</tbody>
+		</table>
+
+        <a href="/createMedia" class="button">Create Short Link / custom URL</a>
+		<a href="/createMedia" class="button">Create Image </a>
+		<a href="/createMedia" class="button">Create Text </a>
         <a href="/logout">Logout</a>
     </main>
 
