@@ -91,11 +91,9 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-       
         const user = await userCollection.findOne({ email });
 
         if (!user) {
-        
             return res.render('login', { message: 'Invalid email or password' });
         }
 
@@ -103,7 +101,6 @@ router.post('/login', async (req, res) => {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-   
             return res.render('login', { message: 'Invalid email or password' });
         }
 
@@ -138,28 +135,35 @@ function requireAuthentication(req, res, next) {
   }
   
 
-  router.get('/home', requireAuthentication, (req, res) => {
-	res.render('home'); 
+  router.get('/home', requireAuthentication, async (req, res) => {
+
+	try {
+		const media = await mediaCollection.find().project({_id: 1}).toArray();
+
+		if (media === null) {
+			// res.render('error', {message: 'Error connecting to MongoDB'});
+			console.log("Error connecting to user collection");
+		}
+		else {
+			media.map((item) => {
+				item.user_id = item._id;
+				return item;
+			});
+			console.log(media);
+
+			res.render('home', {allMedias: media});
+		}
+	}
+	catch(ex) {
+		res.render('error', {message: 'Error connecting to MySQL'});
+		console.log("Error connecting to MySQL");
+		console.log(ex);
+	}
+
+	
   });
 
 
-// 	User.findById(req.session.userId, (err, user) => {
-// 	  if (err || !user) {
-// 		return res.render('error', { message: 'User not found' });
-// 	  }
-  
-// 	  res.render('home.ejs', { user });
-// 	});
-//   });
-  
-//   router.get('/logout', (req, res) => {
-// 	req.session.destroy((err) => {
-// 	  if (err) {
-// 		console.error(err);
-// 	  }
-// 	  res.redirect('/login');
-// 	});
-//   });
   
 
 // router.get('/pic', async (req, res) => {
