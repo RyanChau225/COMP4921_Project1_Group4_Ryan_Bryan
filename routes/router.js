@@ -136,29 +136,29 @@ function requireAuthentication(req, res, next) {
   
 
   router.get('/home', requireAuthentication, async (req, res) => {
+ // GETS ALL MEDIA (NOT JUST THE USERS, NEED TO SWAP TO "showpets" version)
+	// try {
+	// 	const media = await mediaCollection.find().project({_id: 1}).toArray();
 
-	try {
-		const media = await mediaCollection.find().project({_id: 1}).toArray();
+	// 	if (media === null) {
+	// 		// res.render('error', {message: 'Error connecting to MongoDB'});
+	// 		console.log("Error connecting to user collection");
+	// 	}
+	// 	else {
+	// 		media.map((item) => {
+	// 			item.user_id = item._id;
+	// 			return item;
+	// 		});
+	// 		console.log(media);
 
-		if (media === null) {
-			// res.render('error', {message: 'Error connecting to MongoDB'});
-			console.log("Error connecting to user collection");
-		}
-		else {
-			media.map((item) => {
-				item.user_id = item._id;
-				return item;
-			});
-			console.log(media);
-
-			res.render('home', {allMedias: media});
-		}
-	}
-	catch(ex) {
-		res.render('error', {message: 'Error connecting to MySQL'});
-		console.log("Error connecting to MySQL");
-		console.log(ex);
-	}
+	// 		res.render('home', {allMedias: media});
+	// 	}
+	// }
+	// catch(ex) {
+	// 	res.render('error', {message: 'Error connecting to MySQL'});
+	// 	console.log("Error connecting to MySQL");
+	// 	console.log(ex);
+	// }
 
 	
   });
