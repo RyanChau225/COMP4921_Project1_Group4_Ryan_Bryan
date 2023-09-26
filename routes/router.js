@@ -48,6 +48,12 @@ const mongodb_database = process.env.REMOTE_MONGODB_DATABASE;
 const userCollection = database.db(mongodb_database).collection('users');
 const mediaCollection = database.db(mongodb_database).collection('Media');
 
+
+const imageCollection = database.db(mongodb_database).collection('images');
+const textCollection = database.db(mongodb_database).collection('text');
+
+
+
 const Joi = require("joi");
 const mongoSanitize = require('express-mongo-sanitize');
 
