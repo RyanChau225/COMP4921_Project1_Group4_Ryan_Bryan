@@ -27,10 +27,9 @@ const MongoStore = require('connect-mongodb-session')(session);
 const express = require('express');
 const passwordComplexity = require("joi-password-complexity");
 
-// Define password complexity rules
 const complexityOptions = {
   min: 10,            // Minimum length
-  max: 50,            // Maximum length (adjust as needed)
+  max: 30,            // Maximum length (adjust as needed)
   lowerCase: 1,       // Require at least 1 lowercase letter
   upperCase: 1,       // Require at least 1 uppercase letter
   numeric: 1,         // Require at least 1 digit
@@ -69,7 +68,7 @@ const secret_token = process.env.SECRET_TOKEN
 //     extended: true
 // }));
 
-// Use the session middleware
+
 router.use(session({
     secret: `${secret_token}`,
     saveUninitialized: true,
@@ -82,36 +81,35 @@ router.get('/', async (req, res) => {
 	res.render("index.ejs");
 });
 
-// Add a new route for the login page
+
 router.get('/login', (req, res) => {
-    res.render('login'); // Render the login form
+    res.render('login'); 
 });
 
-// Handle the POST request when the user submits the login form
+
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find the user in the database by their email
+       
         const user = await userCollection.findOne({ email });
 
         if (!user) {
-            // User not found
+        
             return res.render('login', { message: 'Invalid email or password' });
         }
 
-        // Compare the entered password with the stored hashed password
+    
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            // Password is incorrect
+   
             return res.render('login', { message: 'Invalid email or password' });
         }
 
-// You can do this
 req.session.authenticated = true;
-        // Redirect to the home page or any other authenticated page
-        res.redirect('/home'); // Change '/dashboard' to your desired authenticated route
+    
+        res.redirect('/home'); 
     } catch (ex) {
         res.render('error', { message: 'Error connecting to MongoDB' });
         console.error("Error connecting to MongoDB", ex);
@@ -123,33 +121,28 @@ router.get('/logout', (req, res) => {
         if (err) {
             console.error('Error destroying session:', err);
         }
-        res.redirect('/login'); // Redirect to the login page after logout
+        res.redirect('/login'); 
     });
 });
 
 
-// Middleware to check if the user is authenticated
 function requireAuthentication(req, res, next) {
 	if (req.session.authenticated) {
-	  // User is authenticated, proceed to the next middleware or route handler
+
 	  next();
 	} else {
-	  // User is not authenticated, redirect them to the login page
+
 	  console.log("mahhhh")
-	  res.redirect('/login'); // Change '/login' to the actual login route
+	  res.redirect('/login'); 
 	}
   }
   
-  // Apply the authentication middleware to the '/home' route
+
   router.get('/home', requireAuthentication, (req, res) => {
-	res.render('home'); // Render the 'home' EJS template only if the user is authenticated
+	res.render('home'); 
   });
 
-//   router.get('/home', (req, res) => {
-// 	if (!req.session.authenticated) {
-// 	  return res.redirect('/login');
-// 	}
-  
+
 // 	User.findById(req.session.userId, (err, user) => {
 // 	  if (err || !user) {
 // 		return res.render('error', { message: 'User not found' });
@@ -459,9 +452,6 @@ router.get('/addCustomURL', (req, res) => {
 router.get('/signup', (req, res) => {
     res.render("signup.ejs");
 })
-
-
-
 
 
 router.get("*", (req,res) => {
