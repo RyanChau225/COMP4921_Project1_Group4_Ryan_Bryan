@@ -67,7 +67,13 @@ const secret_token = process.env.SECRET_TOKEN
 //     limit: '50mb',
 //     extended: true
 // }));
-
+router.use((req, res, next) => {
+	// Set Expires header to a past date
+	res.header('Expires', '-1');
+	// Set other cache control headers
+	res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate');
+	next();
+  });
 
 router.use(session({
     secret: `${secret_token}`,
@@ -105,7 +111,8 @@ router.post('/login', async (req, res) => {
         }
 
 req.session.authenticated = true;
-    
+req.session.user_id = user._id;    
+
         res.redirect('/home'); 
     } catch (ex) {
         res.render('error', { message: 'Error connecting to MongoDB' });
@@ -113,7 +120,7 @@ req.session.authenticated = true;
     }
 });
 
-router.get('/logout', (req, res) => {
+router.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             console.error('Error destroying session:', err);
@@ -122,20 +129,60 @@ router.get('/logout', (req, res) => {
     });
 });
 
-
 function requireAuthentication(req, res, next) {
 	if (req.session.authenticated) {
 
 	  next();
 	} else {
 
-	  console.log("mahhhh")
+	  console.log("REQUIRE AUTH")
 	  res.redirect('/login'); 
 	}
   }
   
 
   router.get('/home', requireAuthentication, async (req, res) => {
+
+	try {
+		let user_id = req.session.user_id;
+		console.log("user_id: "+user_id);
+
+		// Joi validate
+		const schema = Joi.object(
+			{
+				user_id: Joi.string().alphanum().min(24).max(24).required()
+			});
+		
+		const validationResult = schema.validate({user_id});
+		if (validationResult.error != null) {
+			console.log(validationResult.error);
+
+			res.render('error', {message: 'Invalid user_id'});
+			return;
+		}				
+		const medias = await mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
+
+		if (medias === null) {
+			res.render('error', {message: 'Error connecting to MongoDB'});
+			console.log("Error connecting to userModel");
+		}
+		else {
+			medias.map((item) => {
+				item.media_id = item._id;
+				return item;
+			});			
+			console.log(medias);
+			res.render('home', {allMedias: medias, user_id: user_id});
+		}
+	}
+	catch(ex) {
+		res.render('error', {message: 'Error connecting to MongoDB'});
+		console.log("Error connecting to MongoDB");
+		console.log(ex);
+
+	}
+
+
  // GETS ALL MEDIA (NOT JUST THE USERS, NEED TO SWAP TO "showpets" version)
 	// try {
 	// 	const media = await mediaCollection.find().project({_id: 1}).toArray();
@@ -164,88 +211,231 @@ function requireAuthentication(req, res, next) {
   });
 
 
+  router.post('/addMedia', async (req, res) => {
+	try {
+		console.log("form submit");
   
+		let user_id = req.body.user_id;
+		let media_type = req.body.media_type;
+		let original_link = req.body.original_link;
+		let text_content = req.body.text_content;  // Extract text content from the request
+		let active = req.body.active === 'true';  // Convert the active field to a boolean value
+		// let url = req.body.url;  // Assuming url is generated elsewhere and passed in the request
+		// let shortURL = req.body.shortURL;  // Assuming shortURL is generated elsewhere and passed in the request
+		let url = 'https://example.com';  // Replace with your default URL
+		let shortURL = 'https://example.com/short';  // Replace with your default short URL
+		
+  
+		// Create schema for validation
+		const schema = Joi.object({
+		  user_id: Joi.string().alphanum().min(24).max(24).required(),
+		  media_type: Joi.string().valid('links', 'image', 'text').required(),
+		  original_link: Joi.when('media_type', {
+			  is: 'links',
+			  then: Joi.string().uri().required(),
+			  otherwise: Joi.optional()  // Make this field optional when media_type is not 'links'
+		  }),
+		  text_content: Joi.when('media_type', {
+			  is: 'text',
+			  then: Joi.string().required(),
+			  otherwise: Joi.optional()  // Make this field optional when media_type is not 'text'
+		  }),
+		  active: Joi.boolean().required(),
+		  url: Joi.string().uri().required(),
+		  shortURL: Joi.string().uri().required(),
+		  created: Joi.date(),
+		  last_hit: Joi.date()
+	  }).options({ allowUnknown: true });  // Allow unknown keys
+  
+		// Validate the request data
+		const validationResult = schema.validate({
+			user_id,
+			media_type,
+			original_link,
+			text_content,  // Include text_content in the validation
+			active,
+			url,
+			shortURL,
+			created: new Date(),
+			last_hit: new Date()  // Assuming last_hit is updated to the current date when the media is created
+		});
+  
+		if (validationResult.error != null) {
+			console.log(validationResult.error);
+			res.render('error', { message: 'Invalid data provided' });
+			return;
+		}
+  
+		// Create a document object with common fields
+		const document = {
+			user_id: new ObjectId(user_id),
+			media_type,
+			active,
+			url,
+			shortURL,
+			created: new Date(),
+			last_hit: new Date()
+		};
+  
+		// Add media-specific fields to the document object
+		if (media_type === 'links') {
+			document.original_link = original_link;
+		} else if (media_type === 'text') {
+			document.text_content = text_content;
+		}
+  
+		// MongoDB will automatically create a unique _id for each document
+		await mediaCollection.insertOne(document);
+  
+		res.redirect(`/showMedia?id=${user_id}`);
+	} catch (ex) {
+		res.render('error', { message: 'Error connecting to MongoDB' });
+		console.log("Error connecting to MongoDB");
+		console.log(ex);
+	}
+  });
+  
+  
+  
+//   router.get('/showMedia', async (req, res) => {
+// 	console.log("page hit");
+// 	try {
+// 		let user_id = req.query.id;
+// 		console.log("user_id: " + user_id);
+  
+// 		// Joi validate
+// 		const schema = Joi.object({
+// 			user_id: Joi.string().alphanum().min(24).max(24).required()
+// 		});
+  
+// 		const validationResult = schema.validate({ user_id });
+// 		if (validationResult.error != null) {
+// 			console.log(validationResult.error);
+// 			res.render('error', { message: 'Invalid user_id' });
+// 			return;
+// 		}
+  
+// 		// Fetch media based on user_id
+// 		const media = await mediaCollection.find({ "user_id": new ObjectId(user_id) }).toArray();
+// 		if (media === null) {
+// 			res.render('error', { message: 'Error connecting to MongoDB' });
+// 			console.log("Error connecting to media collection");
+// 		}
+// 		else {
+// 			console.log(media);
+// 			res.render('media', { allMedias: media, user_id: user_id });  // _id can be accessed directly in your media.ejs file
+// 		}
+// 	}
+// 	catch (ex) {
+// 		res.render('error', { message: 'Error connecting to MongoDB' });
+// 		console.log("Error connecting to MongoDB");
+// 		console.log(ex);
+// 	}
+//   });
+  
+  router.get('/media/:id', async (req, res) => {
+	try {
+		const mediaId = req.params.id;
+		const mediaItem = await mediaCollection.findOne({ _id: new ObjectId(mediaId) });
+  
+		if (mediaItem) {
+			if (mediaItem.media_type === 'text') {
+				res.render('textPage', { textContent: mediaItem.text_content });
+			} else if (mediaItem.media_type === 'links') {
+				res.redirect(mediaItem.original_link);
+			} else {
+				res.render('error', { message: 'Invalid media type' });
+			}
+		} else {
+			res.render('error', { message: 'Media item not found' });
+		}
+	} catch (ex) {
+		res.render('error', { message: 'Error connecting to MongoDB' });
+		console.log("Error connecting to MongoDB");
+		console.log(ex);
+	}
+  });
 
-// router.get('/pic', async (req, res) => {
-// 	  res.send('<form action="picUpload" method="post" enctype="multipart/form-data">'
-//     + '<p>Public ID: <input type="text" name="title"/></p>'
-//     + '<p>Image: <input type="file" name="image"/></p>'
-//     + '<p><input type="submit" value="Upload"/></p>'
-//     + '</form>');
-// });
+router.get('/pic', async (req, res) => {
+	  res.send('<form action="picUpload" method="post" enctype="multipart/form-data">'
+    + '<p>Public ID: <input type="text" name="title"/></p>'
+    + '<p>Image: <input type="file" name="image"/></p>'
+    + '<p><input type="submit" value="Upload"/></p>'
+    + '</form>');
+});
 
-// router.post('/picUpload', upload.single('image'), function(req, res, next) {
-// 	let buf64 = req.file.buffer.toString('base64');
-//   stream = cloudinary.uploader.upload("data:image/png;base64," + buf64, function(result) { //_stream
-//     console.log(result);
-//     res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
-//              cloudinary.image(result.public_id, { format: "png", width: 100, height: 130, crop: "fit" }));
-//   }, { public_id: req.body.title } );
-//   console.log(req.body);
-//   console.log(req.file);
+router.post('/picUpload', upload.single('image'), function(req, res, next) {
+	let buf64 = req.file.buffer.toString('base64');
+  stream = cloudinary.uploader.upload("data:image/png;base64," + buf64, function(result) { //_stream
+    console.log(result);
+    res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
+             cloudinary.image(result.public_id, { format: "png", width: 100, height: 130, crop: "fit" }));
+  }, { public_id: req.body.title } );
+  console.log(req.body);
+  console.log(req.file);
 
-// });
+});
 
-// function sleep(ms) {
-// 	return new Promise(resolve => setTimeout(resolve, ms));
-// }
+function sleep(ms) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
 
-// router.post('/setmediaPic', upload.single('image'), function(req, res, next) {
-// 	let image_uuid = uuid();
-// 	let media_id = req.body.media_id;
-// 	let user_id = req.body.user_id;
-// 	let buf64 = req.file.buffer.toString('base64');
-// 	stream = cloudinary.uploader.upload("data:image/octet-stream;base64," + buf64, async function(result) { 
-// 			try {
-// 				console.log(result);
+router.post('/setmediaPic', upload.single('image'), function(req, res, next) {
+	let image_uuid = uuid();
+	let media_id = req.body.media_id;
+	let user_id = req.body.user_id;
+	let buf64 = req.file.buffer.toString('base64');
+	stream = cloudinary.uploader.upload("data:image/octet-stream;base64," + buf64, async function(result) { 
+			try {
+				console.log(result);
 
-// 				console.log("userId: "+user_id);
+				console.log("user_id: "+user_id);
 
 
-// 				// Joi validate
-// 				const schema = Joi.object(
-// 				{
-// 					media_id: Joi.string().alphanum().min(24).max(24).required(),
-// 					user_id: Joi.string().alphanum().min(24).max(24).required()
-// 				});
+				// Joi validate
+				const schema = Joi.object(
+				{
+					media_id: Joi.string().alphanum().min(24).max(24).required(),
+					user_id: Joi.string().alphanum().min(24).max(24).required()
+				});
 			
-// 				const validationResult = schema.validate({media_id, user_id});
-// 				if (validationResult.error != null) {
-// 					console.log(validationResult.error);
+				const validationResult = schema.validate({media_id, user_id});
+				if (validationResult.error != null) {
+					console.log(validationResult.error);
 
-// 					res.render('error', {message: 'Invalid media_id or user_id'});
-// 					return;
-// 				}				
-// 				const success = await mediaCollection.updateOne({"_id": new ObjectId(media_id)},
-// 					{$set: {image_id: image_uuid}},
-// 					{}
-// 				);
+					res.render('error', {message: 'Invalid media_id or user_id'});
+					return;
+				}				
+				const success = await mediaCollection.updateOne({"_id": new ObjectId(media_id)},
+					{$set: {image_id: image_uuid}},
+					{}
+				);
 
-// 				if (!success) {
-// 					res.render('error', {message: 'Error uploading media image to MongoDB'});
-// 					console.log("Error uploading media image");
-// 				}
-// 				else {
-// 					res.redirect(`/showMedia?id=${user_id}`);
-// 				}
-// 			}
-// 			catch(ex) {
-// 				res.render('error', {message: 'Error connecting to MongoDB'});
-// 				console.log("Error connecting to MongoDB");
-// 				console.log(ex);
-// 			}
-// 		}, 
-// 		{ public_id: image_uuid }
-// 	);
-// 	console.log(req.body);
-// 	console.log(req.file);
-// });
+				if (!success) {
+					res.render('error', {message: 'Error uploading media image to MongoDB'});
+					console.log("Error uploading media image");
+				}
+				else {
+					res.redirect(`/showMedia?id=${user_id}`);
+				}
+			}
+			catch(ex) {
+				res.render('error', {message: 'Error connecting to MongoDB'});
+				console.log("Error connecting to MongoDB");
+				console.log(ex);
+			}
+		}, 
+		{ public_id: image_uuid }
+	);
+	console.log(req.body);
+	console.log(req.file);
+});
 
 // router.get('/showMedia', async (req, res) => {
 // 	console.log("page hit");
 // 	try {
 // 		let user_id = req.query.id;
-// 		console.log("userId: "+user_id);
+// 		console.log("user_id: "+user_id);
 
 // 		// Joi validate
 // 		const schema = Joi.object(
@@ -436,19 +626,21 @@ router.post('/addUser', async (req, res) => {
 
 // Render addText.ejs
 router.get('/addText', (req, res) => {
-    res.render("addText.ejs");
+	const user_id = req.session.user_id;
+    res.render("addText.ejs", { user_id: user_id });
 })
 
 
-// Render addImage.ejs
 router.get('/addImage', (req, res) => {
-    res.render("addImage.ejs");
-})
-
+	const user_id = req.session.user_id;
+	const medias = mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
+	res.render('addImage.ejs', {allMedias: medias, user_id: user_id});
+});
 
 // Render customURL.ejs
 router.get('/addCustomURL', (req, res) => {
-    res.render("customURL.ejs");
+	const user_id = req.session.user_id;
+    res.render("customURL.ejs", { user_id: user_id });
 })
 
 

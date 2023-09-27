@@ -2,18 +2,158 @@
 <html>
 	<head>
 		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="stylesheet" href="bulma.min.css">
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/cloudinary-jquery@2.11.3/cloudinary-jquery.min.js"></script>
 		<script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"> </script>
 	</head>
-	<html>
+	<body>
+		<script type="text/javascript"> 
+			$.cloudinary.config({ cloud_name: '<%= process.env.CLOUDINARY_CLOUD_NAME %>', secure: true});
+		</script>
+	
 		<section class="section">
-			<div class="maincolumns columns is-desktop is-vcentered">
-				<div class="column is-10 is-offset-1 container">
-					<div class="notification is-danger">
-						Error: <%= message %>
-					</div>
-				</div>
+			<div class="title">
+				Images
 			</div>
+				<div class="table-container">
+				<table class="table is-bordered is-hoverable is-striped is-narrow">
+					<thead>
+					<tr>
+						<th> IMAGES </th>
+						<th> &nbsp; </th>
+						<th> &nbsp; </th>
+					</tr>
+					</thead>
+					<% if (locals.allMedias) { %>
+					<% let i=0; %>
+					<% for(i=0; i < allMedias.length; i++) { %>
+					<tr>
+						<td><%= allMedias[i].name %></td>
+						<% if (allMedias[i].image_id) { %>
+							<td>
+								<script type="text/javascript">document.write($.cloudinary.imageTag('<%- allMedias[i].image_id %>', {height: 100, width: 100, crop: "fit"}).toHtml());</script>
+							<% } else { %>
+							<td colspan="2">
+								<form action="setmediaPic" method="post" enctype="multipart/form-data">
+									<div class="field is-horizontal">
+										<input type="hidden" name="media_id" value="<%= allMedias[i].media_id %>"/>
+										<input type="hidden" name="user_id" value="<%= allMedias[i].user_id %>"/>
+										<div id="picture-upload" class="file is-info has-name is-small is-right">
+										  <label class="file-label">
+											<input class="file-input" type="file" name="image"/>
+											<span class="file-cta">
+												<span class="file-icon"><i class="fas fa-upload"></i></span>
+												<span class="file-label">Choose a file…</span>
+											</span>
+											<span class="file-name">No File</span>
+										  </label>
+										</div>
+										&nbsp;
+										<div class="field">
+											<button class="button is-link is-small">
+												<span>Upload</span>
+												<span class="icon is-small">
+													<i class="fas fa-image"></i>
+												</span>
+											</button>
+										</div>
+									</div>
+								</form>
+							<% } %>
+						</td>
+						<% if (allMedias[i].image_id) { %>
+						<td><a href="/deleteMediaImage?id=<%= allMedias[i].media_id %>&user=<%= allMedias[i].user_id %>">
+							<span class="icon is-small">
+								<i class="fas fa-eraser"></i>
+							</span></a>
+						</td>
+						<% } %>
+					</tr>
+					<% } %>
+					<tfoot>
+						<tr> <td colspan="3">
+						There are <%= i %> images.
+						</td> </tr>
+					</tfoot>
+				</table>
+				</div>
+			<% } %>
+
+			<form action="addMedia" method="post">
+				<input type="hidden" name="user_id" value="<%= user_id %>" />
+				
+				<div class="field is-horizontal">
+				  <div class="field-label is-normal">
+					<label class="label">Add New Image</label>
+				  </div>
+	  
+				  <div class="field-body">
+					<div class="field">
+					  <p class="control is-expanded">
+						<div class="select is-fullwidth">
+						  <select name="media_type" onchange="toggleInputFields()">
+
+							<option value="image">Image</option>
+
+						  </select>
+						</div>
+					  </p>
+					</div>
+	  
+				
+					<!-- <div class="field" id="original-link-field" style="display: none;">
+					  <p class="control is-expanded">
+						<input name="original_link" class="input" type="text" placeholder="Original Link">
+					  </p>
+					</div>
+					<div class="field" id="text-area-field" style="display: none;">
+					  <p class="control is-expanded">
+						<textarea name="text_content" class="textarea" placeholder="Type your text here"></textarea>
+					  </p>
+					</div>
+	   -->
+					<div class="field is-horizontal">
+					  <div class="field-label is-normal">
+						  <label class="label">Active</label>
+					  </div>
+					  <div class="field-body">
+						  <div class="field">
+							  <div class="control">
+								  <label class="radio">
+									  <input type="radio" name="active" value="true" checked> Yes
+								  </label>
+								  <label class="radio">
+									  <input type="radio" name="active" value="false"> No
+								  </label>
+							  </div>
+						  </div>
+					  </div>
+				  </div>
+				  
+	  
+					<div class="field">
+					  <button class="button is-link">
+						<span>Add</span>
+						<span class="icon is-small">
+						  <i class="fas fa-plus"></i>
+						</span>
+					  </button>
+					</div>
+				  </div>
+				</div>
+			  </form>
+			  <a href="/home" class="button">Go back to home </a>
 		</section>
-	</html>
+		<script>
+		  const fileInput = document.querySelector('#picture-upload input[type=file]');
+		  fileInput.onchange = () => {
+			if (fileInput.files.length > 0) {
+			  const fileName = document.querySelector('#picture-upload .file-name');
+			  fileName.textContent = fileInput.files[0].name;
+			}
+		  }
+		</script>
+	</body>
 </html>
