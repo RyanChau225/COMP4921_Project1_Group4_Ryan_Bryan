@@ -19,6 +19,9 @@ const app = express();
 
 const expireTime = 24 * 60 * 60 * 1000; //expires after 1 day  (hours * minutes * seconds * millis)
 
+// const bodyParser = require('body-parser');
+// app.use(bodyParser.json());  // for parsing application/json
+// app.use(bodyParser.urlencoded({ extended: true }));  // for parsing application/x-www-form-urlencoded
 
 /* secret information section */
 // const mongodb_user = process.env.MONGODB_USER;
@@ -33,17 +36,17 @@ app.set('view engine', 'ejs');
 // app.use(express.urlencoded({extended: false}));
 
 // var mongoStore = MongoStore.create({
-// 	mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@cluster0.fuu9a.mongodb.net/sessions`,
-// 	crypto: {
-// 		secret: mongodb_session_secret
-// 	}
+	// 	mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@cluster0.fuu9a.mongodb.net/sessions`,
+	// 	crypto: {
+		// 		secret: mongodb_session_secret
+	// 	}
 // })
 
 // app.use(session({ 
-//     secret: node_session_secret,
-// 	store: mongoStore, //default is memory store 
-// 	saveUninitialized: false, 
-// 	resave: true
+    //     secret: node_session_secret,
+	// 	store: mongoStore, //default is memory store 
+	// 	saveUninitialized: false, 
+	// 	resave: true
 // }
 // ));
 
