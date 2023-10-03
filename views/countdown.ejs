@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Redirecting...</title>
+</head>
+<body>
+  <div id="countdown">
+    You will be redirected to the 
+    <strong><%= shortURL %></strong> 
+    or 
+    <strong><%= customURL %></strong> 
+    in <span id="seconds"><%= seconds %></span> seconds...
+  </div>
+  <input type="hidden" id="seconds-data" data-seconds="<%= seconds %>">
+  <input type="hidden" id="url-data" data-url="<%= url %>">
+  <script src="/js/countdown.js" type="text/javascript"></script>
+</body>
+</html>

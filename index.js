@@ -10,6 +10,7 @@ global.include = function(file) {
 
 require('dotenv').config(); // FOR ENV ENVIORMENT 
 
+
 const express = require('express');
 const router = include('routes/router');
 const port = process.env.PORT || 3000; // place port in variable 
