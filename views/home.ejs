@@ -24,11 +24,12 @@
           Media
         </div>
         <div id="media-filters">
-          <a class="button" href="/filter/all">No Filter</a>
-          <a class="button" href="/filter/links">Links</a>
-          <a class="button" href="/filter/image">Images</a>
-          <a class="button" href="/filter/text">Text</a>
+          <a class="button" href="/filter/links?user_id=<%= user_id %>">Links</a>
+          <a class="button" href="/filter/image?user_id=<%= user_id %>">Images</a>
+          <a class="button" href="/filter/text?user_id=<%= user_id %>">Text</a>
+          <a class="button" href="/filter/all?user_id=<%= user_id %>">No Filter</a>
       </div>
+      
       
         
         <form action="/addMedia" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">

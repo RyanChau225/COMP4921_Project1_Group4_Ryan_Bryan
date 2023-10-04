@@ -531,6 +531,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
     }
 });
 
+
   
   
   // Assuming you have already defined your Express app and mediaCollection
