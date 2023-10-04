@@ -25,11 +25,12 @@
         </div>
         <div id="media-filters">
           <a class="button" href="/filter/links">Links</a>
-          <a class="button" href="/filter/images">Images</a>
+          <a class="button" href="/filter/image">Images</a>
           <a class="button" href="/filter/text">Text</a>
         </div>
         
-        <form action="/addMedia" method="post" onsubmit="return validateForm()">
+        <form action="/addMedia" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+
           <input type="hidden" name="user_id" value="<%= user_id %>" />
           
           <div class="field is-horizontal">
@@ -73,6 +74,13 @@
                     <textarea name="text_content" class="textarea" placeholder="Type your text here"></textarea>
                 </p>
             </div>
+
+            <div class="field" id="image-upload-field" style="display: none;">
+              <p class="control is-expanded">
+                  <input type="file" name="image" class="input" accept="image/*">
+              </p>
+          </div>
+          
             
 
               <div class="field is-horizontal">

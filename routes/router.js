@@ -216,7 +216,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
     return shortUrl;
   }
 
-  router.post('/addMedia', async (req, res) => {
+  router.post('/addMedia', upload.single('image'), async (req, res) => {
     try {
         console.log("form submit");
   
@@ -251,6 +251,10 @@ router.get('/home', requireAuthentication, async (req, res) => {
             created: Joi.date(),
             last_hit: Joi.date()
         }).options({ allowUnknown: true });
+
+        if (media_type === 'image' && !req.file) {
+          return res.render('error', { message: 'Image file is required for image media type' });
+      }
   
         // Validate the request data
         const validationResult = schema.validate({
@@ -271,6 +275,13 @@ router.get('/home', requireAuthentication, async (req, res) => {
             res.render('error', { message: 'Invalid data provided' });
             return;
         }
+
+        if (media_type === 'image') {
+          let buf64 = req.file.buffer.toString('base64');
+          await cloudinary.uploader.upload("data:image/png;base64," + buf64, function(result) {
+              url = result.url;
+          });
+      }
         // Check if a custom_url is provided
         let shortURL;
         if (custom_url) {
@@ -306,10 +317,12 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
         // Add media-specific fields to the document object
         if (media_type === 'links') {
-            document.original_link = original_link;
-        } else if (media_type === 'text') {
-            document.text_content = text_content;
-        }
+          document.original_link = original_link;
+      } else if (media_type === 'text') {
+          document.text_content = text_content;
+      } else if (media_type === 'image') {
+          document.image_url = url; // Use the Cloudinary URL here
+      }
   
         
   
@@ -391,12 +404,20 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
         await updateLastHitAndHits(id);  // Update the last_hit and hits fields
         //need to implement the image redirect
-        res.render('countdown', {
-          shortURL: mediaItem.shortURL,
-          customURL: mediaItem.custom_url,  // Assume there's a custom_url field
-          url: mediaItem.original_link || `/textpage/${id}`,
-          seconds: 5
-        });
+      let redirectURL;
+      if (mediaItem.media_type === 'image') {
+        // If it's an image type, set the redirect URL to the image URL
+        redirectURL = mediaItem.image_url;
+      } else {
+        redirectURL = mediaItem.original_link || `/textpage/${id}`;
+      }
+
+      res.render('countdown', {
+        shortURL: mediaItem.shortURL,
+        customURL: mediaItem.custom_url,  // Assume there's a custom_url field
+        url: redirectURL,
+        seconds: 5
+      });
   
       } else {
         res.status(404).send('Not found');
