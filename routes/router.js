@@ -515,15 +515,22 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
   router.get('/filter/:mediaType', async (req, res) => {
     try {
-      const mediaType = req.params.mediaType;
-      const userId = req.query.user_id;  // Get user_id from the query parameters
-      const filteredMediaItems = await mediaCollection.find({ media_type: mediaType }).toArray();
-      res.render('home', { allMedia: filteredMediaItems, user_id: userId });
+        const mediaType = req.params.mediaType;
+        const userId = req.query.user_id;  // Get user_id from the query parameters
+        
+        let query = {};  // Default is to fetch all media items
+        if (mediaType !== 'all') {
+            query.media_type = mediaType;
+        }
+        
+        const filteredMediaItems = await mediaCollection.find(query).toArray();
+        res.render('home', { allMedia: filteredMediaItems, user_id: userId });
     } catch (ex) {
-      res.render('error', { message: 'Error filtering media items' });
-      console.error('Error filtering media items:', ex);
+        res.render('error', { message: 'Error filtering media items' });
+        console.error('Error filtering media items:', ex);
     }
-  });
+});
+
   
   
   // Assuming you have already defined your Express app and mediaCollection
