@@ -142,26 +142,23 @@ function requireAuthentication(req, res, next) {
   }
   
 
-  router.get('/home', requireAuthentication, async (req, res) => {
+router.get('/home', requireAuthentication, async (req, res) => {
+    try {
+        let user_id = req.session.user_id;
+        console.log("user_id: " + user_id);
 
-	try {
-		let user_id = req.session.user_id;
-		console.log("user_id: "+user_id);
+        // Joi validate
+        const schema = Joi.object({
+            user_id: Joi.string().alphanum().min(24).max(24).required()
+        });
 
-		// Joi validate
-		const schema = Joi.object(
-			{
-				user_id: Joi.string().alphanum().min(24).max(24).required()
-			});
-		
-		const validationResult = schema.validate({user_id});
-		if (validationResult.error != null) {
-			console.log(validationResult.error);
-
-			res.render('error', {message: 'Invalid user_id'});
-			return;
-		}				
-		const medias = await mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
+        const validationResult = schema.validate({ user_id });
+        if (validationResult.error != null) {
+            console.log(validationResult.error);
+            res.render('error', { message: 'Invalid user_id' });
+            return;
+        }
+        const medias = await mediaCollection.find({ "user_id": new ObjectId(user_id) }).toArray();
 
 		if (medias === null) {
 			res.render('error', {message: 'Error connecting to MongoDB'});
@@ -173,7 +170,7 @@ function requireAuthentication(req, res, next) {
 				return item;
 			});			
 			console.log(medias);
-			res.render('home', {allMedias: medias, user_id: user_id});
+      res.redirect(`/showMedia?id=${user_id}`);
 		}
 	}
 	catch(ex) {
@@ -182,6 +179,8 @@ function requireAuthentication(req, res, next) {
 		console.log(ex);
 
 	}
+
+
 
 
  // GETS ALL MEDIA (NOT JUST THE USERS, NEED TO SWAP TO "showpets" version)
@@ -434,7 +433,7 @@ function requireAuthentication(req, res, next) {
   
   
   router.get('/showMedia', async (req, res) => {
-    console.log("page hit");
+    console.log("show media hit");
     try {
         let user_id = req.query.id;
         console.log("userId: " + user_id);
