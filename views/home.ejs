@@ -122,7 +122,6 @@
               <tr>
                 <th>Title</th> 
                 <th>Media Type</th>
-                <th>Original Link</th>
                 <th>Active</th>
                 <th>URL</th>
                 <th>Short URL</th>
@@ -136,7 +135,6 @@
             <tr>
               <td><%= allMedia[i].title %></td> 
               <td><%= allMedia[i].media_type %></td>
-              <td><%= allMedia[i].original_link %></td>
               <td>
                 <% if (allMedia[i].active) { %>
                   <form action="/deactivateMedia" method="post">
