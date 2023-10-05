@@ -333,7 +333,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
         if (media_type === 'text') {
           // Now that the document has been inserted, the _id field has been generated
           // Update the document to set the url field
-          const newUrl = `${BASE_URL}/textpage/${result.insertedId}`;
+          const newUrl = `${BASE_URL}/textPage/${result.insertedId}`;
           await mediaCollection.updateOne(
               { _id: result.insertedId },
               { $set: { url: newUrl } }
@@ -411,7 +411,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
         // If it's an image type, set the redirect URL to the image URL
         redirectURL = mediaItem.image_url;
       } else {
-        redirectURL = mediaItem.original_link || `/textpage/${id}`;
+        redirectURL = mediaItem.original_link || `/textPage/${id}`;
       }
 
       res.render('countdown', {
@@ -498,7 +498,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
         if (mediaItem) {
             if (mediaItem.media_type === 'text') {
-                res.render('textpage', { textContent: mediaItem.text_content });
+                res.render('textPage', { textContent: mediaItem.text_content });
             } else if (mediaItem.media_type === 'links') {
                 res.redirect(mediaItem.original_link);
             } else {
@@ -593,7 +593,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
     res.redirect(`/showMedia?id=${req.body.user_id}`);
   });
   
-  router.get('/textpage/:id', async (req, res) => {
+  router.get('/textPage/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const mediaItem = await mediaCollection.findOne({ _id: new ObjectId(id) });
@@ -603,7 +603,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
             return;
         }
   
-        res.render('textpage', { text_content: mediaItem.text_content });
+        res.render('textPage', { text_content: mediaItem.text_content });
     } catch (ex) {
         res.render('error', { message: 'Error retrieving text content' });
         console.log("Error retrieving text content:", ex);
