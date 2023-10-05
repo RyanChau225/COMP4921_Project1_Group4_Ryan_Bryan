@@ -757,92 +757,6 @@ router.post('/setmediaPic', upload.single('image'), function(req, res, next) {
 	console.log(req.file);
 });
 
-// router.get('/showMedia', async (req, res) => {
-// 	console.log("page hit");
-// 	try {
-// 		let user_id = req.query.id;
-// 		console.log("user_id: "+user_id);
-
-// 		// Joi validate
-// 		const schema = Joi.object(
-// 			{
-// 				user_id: Joi.string().alphanum().min(24).max(24).required()
-// 			});
-		
-// 		const validationResult = schema.validate({user_id});
-// 		if (validationResult.error != null) {
-// 			console.log(validationResult.error);
-
-// 			res.render('error', {message: 'Invalid user_id'});
-// 			return;
-// 		}				
-// 		const Media = await mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
-
-// 		if (Media === null) {
-// 			res.render('error', {message: 'Error connecting to MongoDB'});
-// 			console.log("Error connecting to userModel");
-// 		}
-// 		else {
-// 			Media.map((item) => {
-// 				item.media_id = item._id;
-// 				return item;
-// 			});			
-// 			console.log(Media);
-// 			res.render('Media', {allMedia: Media, user_id: user_id});
-// 		}
-// 	}
-// 	catch(ex) {
-// 		res.render('error', {message: 'Error connecting to MongoDB'});
-// 		console.log("Error connecting to MongoDB");
-// 		console.log(ex);
-// 	}
-// });
-
-
-// router.get('/deletemediaImage', async (req, res) => {
-// 	try {
-// 		console.log("delete media image");
-
-// 		let media_id = req.query.id;
-// 		let user_id = req.query.user;
-
-// 		const schema = Joi.object(
-// 			{
-// 				user_id: Joi.string().alphanum().min(24).max(24).required(),
-// 				media_id: Joi.string().alphanum().min(24).max(24).required(),
-// 			});
-		
-// 		const validationResult = schema.validate({user_id, media_id});
-		
-// 		if (validationResult.error != null) {
-// 			console.log(validationResult.error);
-
-// 			res.render('error', {message: 'Invalid user_id or media_id'});
-// 			return;
-// 		}				
-
-// 		if (media_id) {
-// 			console.log("mediaId: "+media_id);
-// 			const success = await mediaCollection.updateOne({"_id": new ObjectId(media_id)},
-// 				{$set: {image_id: undefined}},
-// 				{}
-// 			);
-
-// 			console.log("delete media Image: ");
-// 			console.log(success);
-// 			if (!success) {
-// 				res.render('error', {message: 'Error connecting to MongoDB'});
-// 				return;
-// 			}
-// 		}
-// 		res.redirect(`/showMedia?id=${user_id}`);
-// 	}
-// 	catch(ex) {
-// 		res.render('error', {message: 'Error connecting to MongoDB'});
-// 		console.log("Error connecting to MongoDB");
-// 		console.log(ex);	
-// 	}
-// });
 
 router.post('/addUser', async (req, res) => {
 	try {
@@ -888,8 +802,7 @@ router.post('/addUser', async (req, res) => {
 		  password: hash
 		});
   
-		// Login user via express-session
-		// req.session.username = req.body.username;
+
   
 		res.redirect("/");
 	  });
@@ -900,32 +813,10 @@ router.post('/addUser', async (req, res) => {
 	}
   });
   
-// Function to check if the username exists in the database
-// async function isUsernameInDb(username) {
-//     const user = await userCollection.findOne({ username });
-//     return !!user;
-// }
 
 
 
-// Render addText.ejs
-router.get('/addText', (req, res) => {
-	const user_id = req.session.user_id;
-    res.render("addText.ejs", { user_id: user_id });
-})
 
-
-router.get('/addImage', (req, res) => {
-	const user_id = req.session.user_id;
-	const medias = mediaCollection.find({"user_id": new ObjectId(user_id)}).toArray();
-	res.render('addImage.ejs', {allMedias: medias, user_id: user_id});
-});
-
-// Render customURL.ejs
-router.get('/addCustomURL', (req, res) => {
-	const user_id = req.session.user_id;
-    res.render("customURL.ejs", { user_id: user_id });
-})
 
 
 // Render signup.ejs
