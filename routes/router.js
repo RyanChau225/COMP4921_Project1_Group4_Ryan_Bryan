@@ -18,7 +18,7 @@ cloudinary.config({
 const mongoose = require('mongoose');
 
 const bodyparser = require('body-parser');
-const BASE_URL = "https://yourdomain.com"; // Replace 'yourdomain.com' with your desired domain.
+const BASE_URL = "http://hcgaikfxpe.us19.qoddiapp.com"; // Replace 'yourdomain.com' with your desired domain.
 
 
 const bcrypt = require('bcrypt');
