@@ -498,7 +498,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
         if (mediaItem) {
             if (mediaItem.media_type === 'text') {
-                res.render('textPage', { textContent: mediaItem.text_content });
+                res.render('textpage', { textContent: mediaItem.text_content });
             } else if (mediaItem.media_type === 'links') {
                 res.redirect(mediaItem.original_link);
             } else {
