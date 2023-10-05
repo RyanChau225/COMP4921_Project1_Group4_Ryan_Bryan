@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="bulma.min.css">
+  <link rel="stylesheet" href="/styles/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+</head>
+
+<body>
+  <section class="section">
+    <div class="maincolumns columns is-desktop is-vcentered">
+      <div class="column is-10 is-offset-1 notification is-info is-light box container">
+        <div class="title">
+          Media
+        </div>
+        <% if (locals.allMedia) { %>
+        <div class="table-container">
+          <table class="table is-bordered is-hoverable is-striped is-narrow">
+            <thead>
+              <tr>
+                <th>Media ID</th>
+                <th>Media Type</th>
+                <th>Original Link</th>
+                <th>Active</th>
+                <th>URL</th>
+                <th>Short URL</th>
+                <th>Created</th>
+                <th>Last Hit</th>
+              </tr>
+            </thead>
+            <% let i=0; %>
+            <% for(i=0; i < allMedia.length; i++) { %>
+            <tr>
+              <td><%= allMedia[i].media_id %></td>
+              <td><%= allMedia[i].media_type %></td>
+              <td><%= allMedia[i].original_link %></td>
+              <td><%= allMedia[i].active ? 'Yes' : 'No' %></td>
+              <td><%= allMedia[i].url %></td>
+              <td><%= allMedia[i].shortURL %></td>
+              <td><%= allMedia[i].created %></td>
+              <td><%= allMedia[i].last_hit %></td>
+            </tr>
+            <% } %>
+            <tfoot>
+              <tr>
+                <td colspan="8">
+                  There are <%= i %> media items.
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <% } %>
+
+        <form action="addMedia" method="post">
+          <input type="hidden" name="user_id" value="<%= user_id %>" />
+          
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Add New Media</label>
+            </div>
+
+            <div class="field-body">
+              <div class="field">
+                <p class="control is-expanded">
+                  <div class="select is-fullwidth">
+                    <select name="media_type" onchange="toggleInputFields()">
+                      <option value="text">Text</option>
+                      <option value="image">Image</option>
+                      <option value="links">Link</option>
+                    </select>
+                  </div>
+                </p>
+              </div>
+
+          
+              <div class="field" id="original-link-field" style="display: none;">
+                <p class="control is-expanded">
+                  <input name="original_link" class="input" type="text" placeholder="Original Link">
+                </p>
+              </div>
+              <div class="field" id="text-area-field" style="display: none;">
+                <p class="control is-expanded">
+                  <textarea name="text_content" class="textarea" placeholder="Type your text here"></textarea>
+                </p>
+              </div>
+
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Active</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <label class="radio">
+                                <input type="radio" name="active" value="true" checked> Yes
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="active" value="false"> No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+              <div class="field">
+                <button class="button is-link">
+                  <span>Add</span>
+                  <span class="icon is-small">
+                    <i class="fas fa-plus"></i>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <script src="/scripts/script.js" type="text/javascript"></script>
+</body>
+
+</html>
