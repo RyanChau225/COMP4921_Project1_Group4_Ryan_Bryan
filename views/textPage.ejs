@@ -1,11 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Text Page</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Text Page!</title>
+    <!-- Links -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <!-- End of Links -->
 </head>
 <body>
-    <div id="text-content">
-        <%= text_content %>
-    </div>
+<!-- Sticky Header -->
+<section class="hero is-fullheight is-default is-bold">
+  <div class="hero-head">
+      <!-- Include your header content here -->
+      <%- include("templates/header") %>
+  </div>
+
+  <div class="hero-body">
+      <!-- Centered Text Page Content -->
+      <div class="container has-text-centered">
+          <div class="columns is-vcentered is-centered">
+              <div class="column is-8-desktop">
+                  <div class="box" id="textcontent" style="background-color: rgba(255, 255, 255, 0.1); max-height: 80vh; overflow-y: auto; overflow-x: hidden; word-wrap: break-word;">
+                      <p class="title is-3">
+                          <%= text_content %>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- End of Centered Text Page Content -->
+  </div>
+
+  <div class="hero-foot">
+      <!-- Include your footer content here -->
+      <%- include("templates/footer") %>
+  </div>
+</section>
+
 </body>
 </html>

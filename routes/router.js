@@ -18,6 +18,8 @@ cloudinary.config({
 const mongoose = require('mongoose');
 
 const bodyparser = require('body-parser');
+const BASE_URL = "https://yourdomain.com"; // Replace 'yourdomain.com' with your desired domain.
+
 
 const bcrypt = require('bcrypt');
 const {
@@ -212,7 +214,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
 
   function createShortUrl(originalUrl) {
     const id = crypto.randomBytes(4).toString('hex');  // Create a random 8-character identifier
-    const shortUrl = `https://example.com/${id}`;
+    const shortUrl = `${BASE_URL}/${id}`;
     return shortUrl;
   }
 
@@ -226,7 +228,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
         let text_content = req.body.text_content;
         let title = req.body.title;
         let active = req.body.active === 'true';
-        let url = `https://example.com/${uuidv4()}`;
+        let url = `${BASE_URL}/${uuidv4()}`;
         let custom_url = req.body.custom_url;
   
         
@@ -286,7 +288,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
         let shortURL;
         if (custom_url) {
           // Prepend the domain to the custom_url
-          shortURL = `https://example.com/${custom_url}`;
+          shortURL = `${BASE_URL}/${custom_url}`;
         } else {
           // Generate a short URL as before
           shortURL = createShortUrl(original_link);
@@ -331,7 +333,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
         if (media_type === 'text') {
           // Now that the document has been inserted, the _id field has been generated
           // Update the document to set the url field
-          const newUrl = `https://example.com/textpage/${result.insertedId}`;
+          const newUrl = `${BASE_URL}/textpage/${result.insertedId}`;
           await mediaCollection.updateOne(
               { _id: result.insertedId },
               { $set: { url: newUrl } }
@@ -350,7 +352,7 @@ router.get('/home', requireAuthentication, async (req, res) => {
   
   router.get('/media/:id', async (req, res) => {
     try {
-        const shortUrl = `https://example.com/${req.params.id}`;
+        const shortUrl = `${BASE_URL}/${req.params.id}`;
         const mediaItem = await mediaCollection.findOne({ shortURL: shortUrl });
         if (mediaItem && mediaItem.media_type === 'links') {
             await updateLastHit(mediaItem._id.toString());  // Update the last_hit field
